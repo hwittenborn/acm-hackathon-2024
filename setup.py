@@ -1,3 +1,6 @@
+import subprocess
+import sys
+
 def checkRequirements():
     required_libraries = [
         "opencv-python",
