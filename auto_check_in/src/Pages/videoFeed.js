@@ -2,15 +2,21 @@ import "./feed.css"
 import TestIcon from '../RSVPPics/Ian Bohanan.jpg';
 import React, { useEffect, useState } from 'react';
 
-function RSVPGuest({image,name}) {
-    const isCheckedIn = false;
+function RSVPGuest({image,name, isCheckedIn}) {
+    const [arrived, setArrived] = useState(0)
+
+    if(isCheckedIn && arrived==0)
+    {
+        setArrived(arrived+1)
+    }
+
     return (
       <div className="RSVPGuestContainer">
-        <div style={{ margin: '5%', display:'flex', }}>
+        <div style={{ margin: '5%', display:'flex', backgroundColor: arrived>0 ? 'green' : 'red'}}>
             <img className="GuestIcon" src={image}/>
             <div>
                 <p>{name}</p>
-                {isCheckedIn ? <p>Checked in 5:00PM</p> : <p>Not checked in</p>}
+                {arrived>0 ? <p>Checked in 5:00PM</p> : <p>Not checked in</p>}
             </div>
         </div>
       </div>
@@ -38,6 +44,8 @@ function UnknownGuest(){
 export function VideoFeed(){
 
     const [images, setImages] = useState([]);
+    const [activeName, setActiveName] = useState('');
+    const [isChecked, setChecked] = useState(false)
 
     useEffect(() => {
         // Dynamically require images
@@ -57,16 +65,28 @@ export function VideoFeed(){
         };
       });
 
+    const handleButtonClick = () => {
+        setChecked(true)
+    };
+
     return(
         <>
         <h1>This is the video feed</h1>
+
+        <input 
+          type="text" 
+          placeholder="Enter Name" 
+          value={activeName}
+          onChange={(e) => setActiveName(e.target.value)}
+        />
+        <button onClick={handleButtonClick}>Highlight</button>
 
         <div className="GuestListsContainer">
 
             <div className="KnownGuests">
                 <h2>Known Guests</h2>
                 {knownGuests.map((person, index) => (
-                    <RSVPGuest key={index} image={person.image} name={person.name} />
+                    <RSVPGuest key={index} image={person.image} name={person.name} isCheckedIn={activeName==person.name}/>
                 ))}
             </div>
 
