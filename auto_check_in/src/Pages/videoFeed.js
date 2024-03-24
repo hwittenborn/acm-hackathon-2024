@@ -47,16 +47,15 @@ export function VideoFeed(){
         setImages(imagePaths);
       }, []);
 
-      const persons = [
-        {
-          image: images[0],
-          name: 'Ian Bohanan',
-        },
-        {
-          image: images[1],
-          name: 'John Doe'
-        }
-      ];
+      const knownGuests = images.map(image => {
+        // Extract filename from image path
+        const filename = image.split('/').pop().split('.')[0];
+        
+        return {
+          image: image,
+          name: filename
+        };
+      });
 
     return(
         <>
@@ -66,7 +65,7 @@ export function VideoFeed(){
 
             <div className="KnownGuests">
                 <h2>Known Guests</h2>
-                {persons.map((person, index) => (
+                {knownGuests.map((person, index) => (
                     <RSVPGuest key={index} image={person.image} name={person.name} />
                 ))}
             </div>
