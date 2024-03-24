@@ -1,17 +1,25 @@
 import cv2
+import json
 import os
 import threading
 import time
+import uvicorn
 import face_recognition as fr
 
+from fastapi import FastAPI
 from pathlib import Path
+from threading import Thread, Lock
 
+# The FastAPI application.
+APP = FastAPI()
+# The thread lock.
+LOCK = Lock()
 # The URL for the video device.
 URL = "rtsp://test:oshtest@192.168.1.36:554"
 # The `cv2.VideoCapture` instance.
 CAPTURE = cv2.VideoCapture(f"rtspsrc location={URL} ! decodebin ! videoconvert ! video/x-raw,framerate=30/1 ! appsink drop=true sync=false", cv2.CAP_GSTREAMER)
 # Our tolerance level.
-TOLERANCE = 0.6
+TOLERANCE = 0.4
 
 # A face returned from `find_faces()`.
 class Face:
@@ -60,12 +68,12 @@ def find_faces(known_faces):
     
     return faces
 
-# The entrypoint of the program.
-if __name__ == "__main__":
+# The camera capture loop.
+def process_camera():
     known_faces = get_known_faces()
     known_faces_data = list(known_faces.values())
     unknown_faces = {} # The unknown faces, determined in each loop run.
-    checked_in = [] # The checked-in users.
+    checked_in = []
 
     while True:
         _, frame = CAPTURE.read() # DEBUG: REMOVE LATER !!
@@ -83,7 +91,8 @@ if __name__ == "__main__":
         # then check them in.
         for name, face in known_faces.items():
             if True in fr.compare_faces(known, face, tolerance=TOLERANCE) and name not in checked_in:
-                checked_in.append(name)
+                with LOCK:
+                    checked_in.append(name)
         
         unknown_faces_data = list(unknown_faces.values())
         for face in unknown:
@@ -110,14 +119,33 @@ if __name__ == "__main__":
 
             cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
             cv2.putText(frame, name, (left, bottom + 25), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
+        
 
-        # Print our data.
-        print("Checked in guests:")
-        for name in checked_in:
-            print(f"  - {name}")
+        with open("session-info.txt", "w") as file:
+            file.write(json.dumps({
+                "checked_in": checked_in,
+                "guest_names": list(unknown_faces.keys())
+            }))
 
-        print("Unknown people:")
-        for name in unknown_faces:
-            print(f"  - {name}")
-    
-        cv2.imwrite("out.jpg", frame) # !! DEBUG LINE: REMOVE LATER !!
+# FastAPI Endpoints
+@APP.get("/session-info")
+def session_info():
+    with open("session-info.txt", "r") as file:
+        # This might raise an exception if our write call in `process_camera`
+        # is still writing out the JSON. Fix that by looping until we get a
+        # succesful call.
+        while True:
+            try:
+                return json.loads(file.read())
+            except Exception:
+                continue
+
+if __name__ == "__main__":
+    # Start the camera processing in another thread.
+    thread = Thread(target=process_camera)
+    thread.start()
+
+    # Start up the HTTP server.
+    config = uvicorn.Config("request:APP", port=5000)
+    server = uvicorn.Server(config)
+    server.run()
