@@ -9,3 +9,26 @@
     width: auto;
     height:15vh;
 }
+
+.UnknownGuestContainer{
+        margin: '5%';
+        display:'flex';
+        flex-direction:'column';
+        color:white
+}
+
+.KnownGuests h2
+{
+    color:white;
+}
+
+.UnknownGuests h2
+{
+    color:white;
+}
+
+.GuestListsContainer
+{
+    display:flex;
+    gap: 30%;
+}
