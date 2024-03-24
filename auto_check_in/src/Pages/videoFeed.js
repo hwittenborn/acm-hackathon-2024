@@ -36,13 +36,13 @@ function RSVPGuest({image,name, isCheckedIn}) {
     );
 }
 
-function UnknownGuest(image){
+function UnknownGuest({image}){
     return (
         <div className="UnknownGuestContainer">
             <img className="GuestIcon" src={image}/>
             <div>
                 <label>
-                    <input name="myInput" defaultValue="Unknown Guest 1"/>
+                    <input name="myInput" defaultValue="Unknown Guest"/>
                 </label>
                 <button>
                     <span className="material-icons">check</span>
@@ -57,17 +57,34 @@ function UnknownGuest(image){
 export function VideoFeed(){
 
     const [images, setImages] = useState([]);
+    const [unknownImages, setUnknownImages] = useState([]);
     const [activeName, setActiveName] = useState(''); //Modify this to set who has and hasn't checked in!
 
     useEffect(() => {
         // Dynamically require images
         const context = require.context('../../../profiles/', false, /\.(jpg|jpeg)$/);
         const imagePaths = context.keys().map(context);
-    
         setImages(imagePaths);
       }, []);
 
+      useEffect(() => {
+        // Dynamically require images
+        const context = require.context('../../../unknownGuests/', false, /\.(jpg|jpeg)$/);
+        const imagePaths = context.keys().map(context);
+        setUnknownImages(imagePaths);
+      }, []);
+
       const knownGuests = images.map(image => {
+        // Extract filename from image path
+        const filename = image.split('/').pop().split('.')[0];
+        
+        return {
+          image: image,
+          name: filename
+        };
+      });
+
+      const unknownGuests = unknownImages.map(image => {
         // Extract filename from image path
         const filename = image.split('/').pop().split('.')[0];
         
@@ -100,7 +117,9 @@ export function VideoFeed(){
 
             <div className="UnknownGuests">
                 <h2>Unknown Guests</h2>
-                
+                {unknownGuests.map((person, index) => (
+                    <UnknownGuest key={index} image={person.image}/>
+                ))}
             </div>
 
         </div>
