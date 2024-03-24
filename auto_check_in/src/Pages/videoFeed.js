@@ -1,5 +1,4 @@
 import "./feed.css"
-import TestIcon from '../RSVPPics/Ian Bohanan.jpg';
 import React, { useEffect, useState } from 'react';
 
 function RSVPGuest({image,name, isCheckedIn}) {
@@ -37,10 +36,10 @@ function RSVPGuest({image,name, isCheckedIn}) {
     );
 }
 
-function UnknownGuest(){
+function UnknownGuest(image){
     return (
         <div className="UnknownGuestContainer">
-            <img className="GuestIcon" src={TestIcon}/>
+            <img className="GuestIcon" src={image}/>
             <div>
                 <label>
                     <input name="myInput" defaultValue="Unknown Guest 1"/>
@@ -101,7 +100,7 @@ export function VideoFeed(){
 
             <div className="UnknownGuests">
                 <h2>Unknown Guests</h2>
-                <UnknownGuest/>
+                
             </div>
 
         </div>
