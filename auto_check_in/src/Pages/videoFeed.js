@@ -37,9 +37,22 @@ function RSVPGuest({image,name, isCheckedIn}) {
 }
 
 function UnknownGuest({image}){
+
+    const date = new Date();
+    var hour = date.getHours();
+    var appendTime = 'AM';
+    if(hour > 12)
+    {
+        hour=hour-12;
+        appendTime = 'PM';
+    }
+    const showTime = hour
+    + ':' + date.getMinutes() + appendTime;
+
     return (
         <div className="UnknownGuestContainer">
             <img className="GuestIcon" src={image}/>
+            <p>Arrived at {showTime}</p>
             <div>
                 <label>
                     <input name="myInput" defaultValue="Unknown Guest"/>
@@ -121,7 +134,6 @@ export function VideoFeed(){
                     <UnknownGuest key={index} image={person.image}/>
                 ))}
             </div>
-
         </div>
 
 
