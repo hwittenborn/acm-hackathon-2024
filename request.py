@@ -2,6 +2,7 @@ import cv2
 import os
 import threading
 import time
+import subprocess
 import face_recognition as fr
 
 from pathlib import Path
@@ -112,6 +113,7 @@ if __name__ == "__main__":
             cv2.putText(frame, name, (left, bottom + 25), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
 
         # Print our data.
+        subprocess.run(["clear"])
         print("Checked in guests:")
         for name in checked_in:
             print(f"  - {name}")
