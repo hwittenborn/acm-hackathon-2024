@@ -61,7 +61,7 @@ export function VideoFeed(){
 
     useEffect(() => {
         // Dynamically require images
-        const context = require.context('../RSVPPics/', false, /\.(jpg|jpeg|png)$/);
+        const context = require.context('../../../profiles/', false, /\.(jpg|jpeg)$/);
         const imagePaths = context.keys().map(context);
     
         setImages(imagePaths);
