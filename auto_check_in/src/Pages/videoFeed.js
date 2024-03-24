@@ -1,3 +1,5 @@
+import "./feed.css"
+
 export function VideoFeed(){
     return(
         <>
