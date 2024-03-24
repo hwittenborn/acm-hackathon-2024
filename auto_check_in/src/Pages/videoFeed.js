@@ -3,11 +3,25 @@ import TestIcon from '../RSVPPics/Ian Bohanan.jpg';
 import React, { useEffect, useState } from 'react';
 
 function RSVPGuest({image,name, isCheckedIn}) {
+
     const [arrived, setArrived] = useState(0)
+    const [checkInTime, setCheckInTime] = useState(0);
 
     if(isCheckedIn && arrived==0)
     {
         setArrived(arrived+1)
+
+        const date = new Date();
+        var hour = date.getHours();
+        var appendTime = 'AM';
+        if(hour > 12)
+        {
+            hour=hour-12;
+            appendTime = 'PM';
+        }
+        const showTime = hour
+        + ':' + date.getMinutes() + appendTime;
+        setCheckInTime(showTime);
     }
 
     return (
@@ -16,7 +30,7 @@ function RSVPGuest({image,name, isCheckedIn}) {
             <img className="GuestIcon" src={image}/>
             <div>
                 <p>{name}</p>
-                {arrived>0 ? <p>Checked in 5:00PM</p> : <p>Not checked in</p>}
+                {arrived>0 ? <p>Checked in at {checkInTime}</p> : <p>Not checked in</p>}
             </div>
         </div>
       </div>
@@ -44,8 +58,7 @@ function UnknownGuest(){
 export function VideoFeed(){
 
     const [images, setImages] = useState([]);
-    const [activeName, setActiveName] = useState('');
-    const [isChecked, setChecked] = useState(false)
+    const [activeName, setActiveName] = useState(''); //Modify this to set who has and hasn't checked in!
 
     useEffect(() => {
         // Dynamically require images
@@ -65,10 +78,6 @@ export function VideoFeed(){
         };
       });
 
-    const handleButtonClick = () => {
-        setChecked(true)
-    };
-
     return(
         <>
         <h1>This is the video feed</h1>
@@ -79,7 +88,7 @@ export function VideoFeed(){
           value={activeName}
           onChange={(e) => setActiveName(e.target.value)}
         />
-        <button onClick={handleButtonClick}>Highlight</button>
+        <button>Highlight</button>
 
         <div className="GuestListsContainer">
 
